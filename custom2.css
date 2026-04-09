@@ -1,0 +1,321 @@
+/* custom2.css — From-Scratch Football Page Stylesheet */
+
+/* ---- CSS Variables ---- */
+:root {
+  --green: #1a5c2a;
+  --green-light: #2e8b47;
+  --gold: #d4a017;
+  --white: #f5f5f0;
+  --dark: #111;
+  --text-body: #2a2a2a;
+}
+
+/* ---- Global Reset & Body ---- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background-color: #0e1f14;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 60px,
+      rgba(255,255,255,0.03) 60px,
+      rgba(255,255,255,0.03) 61px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 60px,
+      rgba(255,255,255,0.03) 60px,
+      rgba(255,255,255,0.03) 61px
+    );
+  color: var(--white);
+  line-height: 1.7;
+}
+
+/* ---- Navigation ---- */
+#main-nav {
+  background: rgba(10, 25, 15, 0.95);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 40px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid var(--gold);
+}
+
+#main-nav .nav-logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--gold);
+  text-decoration: none;
+  letter-spacing: 2px;
+  font-family: 'Arial Black', sans-serif;
+  text-transform: uppercase;
+}
+
+#main-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 28px;
+}
+
+#main-nav ul li a {
+  color: var(--white);
+  text-decoration: none;
+  font-family: Arial, sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+#main-nav ul li a:hover {
+  color: var(--gold);
+}
+
+/* ---- Hero / Header ---- */
+#hero {
+  background: linear-gradient(160deg, #0a1f10 0%, #163d1f 50%, #0a1f10 100%);
+  text-align: center;
+  padding: 100px 20px 80px;
+  border-bottom: 4px solid var(--gold);
+  position: relative;
+  overflow: hidden;
+}
+
+#hero::before {
+  content: "🏈";
+  font-size: 300px;
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+#hero h1 {
+  font-size: 3.5rem;
+  color: var(--gold);
+  font-family: 'Arial Black', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+}
+
+#hero p {
+  font-size: 1.2rem;
+  color: #c8d8c8;
+  margin-top: 16px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---- Content Sections / Divs ---- */
+.content-section {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 0 24px;
+}
+
+.section-heading {
+  font-family: 'Arial Black', sans-serif;
+  font-size: 1.6rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 2px solid var(--green-light);
+  padding-bottom: 10px;
+  margin-bottom: 24px;
+}
+
+/* ---- Card Div (used for history, positions, etc.) ---- */
+.card-div {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(212, 160, 23, 0.2);
+  border-radius: 10px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  transition: border-color 0.2s;
+}
+
+.card-div:hover {
+  border-color: rgba(212, 160, 23, 0.6);
+}
+
+/* ---- Nested Lists ---- */
+.nested-list-div {
+  background: rgba(26, 92, 42, 0.15);
+  border-left: 4px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 24px 32px;
+  margin-bottom: 24px;
+}
+
+ol.outer-list {
+  padding-left: 20px;
+  font-family: Arial, sans-serif;
+  color: #dde8dd;
+}
+
+ol.outer-list > li {
+  margin-bottom: 14px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+ol.outer-list > li > ul.inner-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-top: 8px;
+  font-weight: normal;
+  color: #c8d8c0;
+  font-size: 0.95rem;
+}
+
+ol.outer-list > li > ul.inner-list li {
+  margin-bottom: 5px;
+}
+
+/* ---- Image styling ---- */
+.football-img {
+  width: 100%;
+  border-radius: 10px;
+  border: 2px solid rgba(212,160,23,0.3);
+  margin: 16px 0;
+}
+
+.img-caption {
+  font-size: 0.82rem;
+  color: #8aab8a;
+  text-align: center;
+  font-style: italic;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+/* ---- YouTube Video ---- */
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 2px solid rgba(212,160,23,0.3);
+  margin: 20px 0;
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ---- Tableau embed div ---- */
+.tableau-div {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(212,160,23,0.2);
+  border-radius: 10px;
+  padding: 24px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.tableau-placeholder {
+  background: rgba(255,255,255,0.05);
+  border: 2px dashed rgba(212,160,23,0.4);
+  border-radius: 8px;
+  padding: 60px 20px;
+  color: #8aab8a;
+  font-style: italic;
+  font-family: Arial, sans-serif;
+}
+
+/* ---- Web App link button ---- */
+.app-link-div {
+  text-align: center;
+  padding: 50px 20px;
+  background: linear-gradient(135deg, #0d2a14, #1a4a26);
+  border-top: 3px solid var(--gold);
+  border-bottom: 3px solid var(--gold);
+  margin: 40px 0;
+}
+
+.app-link-div h2 {
+  font-family: 'Arial Black', sans-serif;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+
+.app-link-div p {
+  color: #b8ccb8;
+  margin-bottom: 24px;
+}
+
+.btn-gold {
+  display: inline-block;
+  background: var(--gold);
+  color: #111;
+  font-family: 'Arial Black', sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 14px 36px;
+  border-radius: 4px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-gold:hover {
+  background: #f0bc30;
+  transform: scale(1.04);
+}
+
+/* ---- Back to Pro Pages button ---- */
+.back-to-pro {
+  display: inline-block;
+  margin: 10px 8px;
+  padding: 10px 24px;
+  background: var(--green);
+  color: var(--white);
+  border-radius: 4px;
+  text-decoration: none;
+  font-family: Arial, sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+
+.back-to-pro:hover {
+  background: var(--green-light);
+  color: var(--white);
+}
+
+/* ---- Footer ---- */
+footer {
+  background: #060e08;
+  text-align: center;
+  padding: 30px 20px;
+  color: #5a7a5a;
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+  border-top: 2px solid var(--green);
+}

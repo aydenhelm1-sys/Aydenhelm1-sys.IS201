@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NFL QB Passer Rating Calculator</title>
+  <style>
+    :root {
+      --green: #1a5c2a;
+      --green-light: #2e8b47;
+      --gold: #d4a017;
+      --gold-light: #f0bc30;
+      --dark: #0a1a0e;
+      --card-bg: rgba(255,255,255,0.06);
+      --border: rgba(212,160,23,0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #0a1a0e;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 60px,
+          rgba(255,255,255,0.025) 60px, rgba(255,255,255,0.025) 61px),
+        repeating-linear-gradient(90deg, transparent, transparent 60px,
+          rgba(255,255,255,0.025) 60px, rgba(255,255,255,0.025) 61px);
+      color: #e8f0e8;
+      min-height: 100vh;
+    }
+
+    /* ---- Nav ---- */
+    nav {
+      background: rgba(5,15,8,0.95);
+      border-bottom: 2px solid var(--gold);
+      padding: 14px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav .logo {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+    nav a.back {
+      color: #c8d8c8;
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav a.back:hover { color: var(--gold); }
+
+    /* ---- Hero ---- */
+    .hero {
+      text-align: center;
+      padding: 60px 20px 30px;
+    }
+    .hero h1 {
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 30px rgba(212,160,23,0.3);
+    }
+    .hero p {
+      color: #9ab89a;
+      margin-top: 12px;
+      font-size: 1rem;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ---- Main Layout ---- */
+    .main-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 20px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 680px) {
+      .main-container { grid-template-columns: 1fr; }
+      .result-panel { grid-column: 1; }
+    }
+
+    /* ---- Card ---- */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    /* ---- Form ---- */
+    .input-group {
+      margin-bottom: 18px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #9ab89a;
+      margin-bottom: 6px;
+    }
+    .input-group input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(212,160,23,0.3);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: #e8f0e8;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .input-group input:focus {
+      border-color: var(--gold);
+      background: rgba(255,255,255,0.09);
+    }
+    .input-group input::placeholder { color: #4a6a4a; }
+
+    .input-group .hint {
+      font-size: 0.75rem;
+      color: #4a7a4a;
+      margin-top: 4px;
+    }
+
+    .btn-calc {
+      width: 100%;
+      background: var(--gold);
+      color: #0a1a0e;
+      font-weight: 900;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-calc:hover { background: var(--gold-light); transform: scale(1.02); }
+    .btn-calc:active { transform: scale(0.98); }
+
+    .btn-reset {
+      width: 100%;
+      background: transparent;
+      color: #6a8a6a;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 1px solid #2a4a2a;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-reset:hover { border-color: #4a7a4a; color: #9ab89a; }
+
+    /* ---- Result Panel ---- */
+    .result-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Rating Display */
+    .rating-display {
+      text-align: center;
+      padding: 30px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rating-display::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: radial-gradient(ellipse at center, rgba(212,160,23,0.08) 0%, transparent 70%);
+    }
+
+    .rating-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #6a9a6a;
+      margin-bottom: 10px;
+    }
+
+    .rating-number {
+      font-size: 5rem;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      text-shadow: 0 0 40px rgba(212,160,23,0.4);
+      transition: all 0.4s;
+    }
+
+    .rating-number.hidden { opacity: 0.2; }
+
+    .rating-grade {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-top: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: color 0.4s;
+    }
+
+    .grade-elite { color: #00e676; }
+    .grade-great { color: #69f0ae; }
+    .grade-good  { color: #b9f6ca; }
+    .grade-avg   { color: #ffd54f; }
+    .grade-poor  { color: #ff8a65; }
+    .grade-bad   { color: #ef5350; }
+    .grade-empty { color: #3a5a3a; }
+
+    /* Component Bars */
+    .component-bars { }
+    .comp-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+    .comp-name {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7a9a7a;
+      width: 90px;
+      flex-shrink: 0;
+    }
+    .comp-bar-bg {
+      flex: 1;
+      height: 8px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .comp-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--gold);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    .comp-value {
+      font-size: 0.82rem;
+      color: #9ab89a;
+      width: 32px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Formula Explanation */
+    .formula-card h2 { margin-bottom: 14px; }
+    .formula-card p {
+      font-size: 0.85rem;
+      color: #7a9a7a;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    .formula-card .formula-step {
+      background: rgba(255,255,255,0.04);
+      border-left: 3px solid var(--gold);
+      padding: 8px 14px;
+      margin-bottom: 8px;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.8rem;
+      color: #9ab89a;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Hall of Fame comparison */
+    .hof-card h2 { margin-bottom: 16px; }
+    .hof-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.88rem;
+    }
+    .hof-row:last-child { border-bottom: none; }
+    .hof-name { color: #c8d8c8; }
+    .hof-rating { color: var(--gold); font-weight: bold; }
+    .hof-bar-bg {
+      flex: 1;
+      height: 5px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      margin: 0 12px;
+      overflow: hidden;
+    }
+    .hof-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--green-light), var(--gold));
+    }
+
+    /* Your rating marker in HOF */
+    .hof-your-row {
+      background: rgba(212,160,23,0.07);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin: 8px 0;
+      border: 1px dashed rgba(212,160,23,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+    }
+    .hof-your-row .hof-name { color: var(--gold); }
+
+    .hidden-until-calc { opacity: 0.35; transition: opacity 0.4s; }
+    .visible { opacity: 1 !important; }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #3a5a3a;
+      font-size: 0.82rem;
+      border-top: 1px solid #1a3a1a;
+    }
+    footer a { color: #5a8a5a; text-decoration: none; }
+    footer a:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="football.html" class="logo">🏈 Football</a>
+  <a href="football.html" class="back">← Back to Football Page</a>
+</nav>
+
+<div class="hero">
+  <h1>QB Passer Rating Calculator</h1>
+  <p>Enter a quarterback's stats to calculate their official NFL passer rating using the real NFL formula.</p>
+</div>
+
+<div class="main-container">
+
+  <!-- INPUT CARD -->
+  <div class="card">
+    <h2>📋 Enter Stats</h2>
+
+    <div class="input-group">
+      <label>QB Name (optional)</label>
+      <input type="text" id="qbName" placeholder="e.g., Patrick Mahomes"/>
+    </div>
+
+    <div class="input-group">
+      <label>Attempts</label>
+      <input type="number" id="attempts" placeholder="e.g., 32" min="1"/>
+    </div>
+
+    <div class="input-group">
+      <label>Completions</label>
+      <input type="number" id="completions" placeholder="e.g., 22" min="0"/>
+    </div>
+
+    <div class="input-group">
+      <label>Passing Yards</label>
+      <input type="number" id="yards" placeholder="e.g., 280" min="0"/>
+    </div>
+
+    <div class="input-group">
+      <label>Touchdowns</label>
+      <input type="number" id="touchdowns" placeholder="e.g., 3" min="0"/>
+    </div>
+
+    <div class="input-group">
+      <label>Interceptions</label>
+      <input type="number" id="interceptions" placeholder="e.g., 1" min="0"/>
+    </div>
+
+    <button class="btn-calc" onclick="calculate()">Calculate Rating</button>
+    <button class="btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="result-panel">
+
+    <!-- Main Rating -->
+    <div class="card rating-display">
+      <div class="rating-label">Passer Rating</div>
+      <div class="rating-number hidden" id="ratingNumber">—</div>
+      <div class="rating-grade grade-empty" id="ratingGrade">Enter stats and calculate</div>
+    </div>
+
+    <!-- Component Breakdown -->
+    <div class="card hidden-until-calc" id="componentCard">
+      <h2>📊 Component Breakdown</h2>
+      <div class="comp-row">
+        <span class="comp-name">Comp %</span>
+        <div class="comp-bar-bg"><div class="comp-bar-fill" id="bar-a"></div></div>
+        <span class="comp-value" id="val-a">—</span>
+      </div>
+      <div class="comp-row">
+        <span class="comp-name">Yds/Att</span>
+        <div class="comp-bar-bg"><div class="comp-bar-fill" id="bar-b"></div></div>
+        <span class="comp-value" id="val-b">—</span>
+      </div>
+      <div class="comp-row">
+        <span class="comp-name">TD %</span>
+        <div class="comp-bar-bg"><div class="comp-bar-fill" id="bar-c"></div></div>
+        <span class="comp-value" id="val-c">—</span>
+      </div>
+      <div class="comp-row">
+        <span class="comp-name">INT %</span>
+        <div class="comp-bar-bg"><div class="comp-bar-fill" id="bar-d"></div></div>
+        <span class="comp-value" id="val-d">—</span>
+      </div>
+      <p style="font-size:0.75rem; color:#4a6a4a; margin-top:8px;">Each component is clamped 0–2.375. Max possible rating = 158.3</p>
+    </div>
+
+  </div>
+
+  <!-- HOF Comparison — full width -->
+  <div class="card hof-card" style="grid-column: 1 / -1;">
+    <h2>🏆 How Does It Compare?</h2>
+
+    <!-- Your rating row (hidden until calculated) -->
+    <div class="hof-your-row hidden-until-calc" id="yourRow">
+      <span class="hof-name" id="yourName">Your QB</span>
+      <div class="hof-bar-bg"><div class="hof-bar-fill" id="yourBar" style="width:0%"></div></div>
+      <span class="hof-rating" id="yourRating">—</span>
+    </div>
+
+    <div class="hof-row">
+      <span class="hof-name">Aaron Rodgers (career)</span>
+      <div class="hof-bar-bg"><div class="hof-bar-fill" style="width:68%"></div></div>
+      <span class="hof-rating">103.1</span>
+    </div>
+    <div class="hof-row">
+      <span class="hof-name">Patrick Mahomes (career)</span>
+      <div class="hof-bar-bg"><div class="hof-bar-fill" style="width:68%"></div></div>
+      <span class="hof-rating">105.2</span>
+    </div>
+    <div class="hof-row">
+      <span class="hof-name">Steve Young (career)</span>
+      <div class="hof-bar-bg"><div class="hof-bar-fill" style="width:64%"></div></div>
+      <span class="hof-rating">96.8</span>
+    </div>
+    <div class="hof-row">
+      <span class="hof-name">Tom Brady (career)</span>
+      <div class="hof-bar-bg"><div class="hof-bar-fill" style="width:62%"></div></div>
+      <span class="hof-rating">97.7</span>
+    </div>
+    <div class="hof-row">
+      <span class="hof-name">Peyton Manning (career)</span>
+      <div class="hof-bar-bg"><div class="hof-bar-fill" style="width:60%"></div></div>
+      <span class="hof-rating">96.5</span>
+    </div>
+    <div class="hof-row">
+      <span class="hof-name">NFL Average (~2023)</span>
+      <div class="hof-bar-bg"><div class="hof-bar-fill" style="width:55%"></div></div>
+      <span class="hof-rating">90.0</span>
+    </div>
+  </div>
+
+  <!-- Formula Card — full width -->
+  <div class="card formula-card" style="grid-column: 1 / -1;">
+    <h2>🔢 How the NFL Formula Works</h2>
+    <p>The official NFL passer rating formula uses four components, each capped between 0 and 2.375:</p>
+    <div class="formula-step">A = ( (Comp/Att) − 0.3 ) × 5</div>
+    <div class="formula-step">B = ( (Yards/Att) − 3 ) × 0.25</div>
+    <div class="formula-step">C = (TD/Att) × 20</div>
+    <div class="formula-step">D = 2.375 − ( (INT/Att) × 25 )</div>
+    <div class="formula-step">Rating = ( (A + B + C + D) / 6 ) × 100</div>
+    <p style="margin-top:10px;">The maximum possible rating is <strong style="color:var(--gold)">158.3</strong>. A rating above 100 is considered excellent; 80–100 is above average; below 70 needs improvement.</p>
+  </div>
+
+</div>
+
+<footer>
+  <a href="football.html">← Football Page</a> &nbsp;·&nbsp;
+  <a href="index.html">Portfolio</a>
+</footer>
+
+<script>
+  function clamp(val, min, max) {
+    return Math.min(Math.max(val, min), max);
+  }
+
+  function calculate() {
+    const att   = parseFloat(document.getElementById('attempts').value);
+    const comp  = parseFloat(document.getElementById('completions').value);
+    const yards = parseFloat(document.getElementById('yards').value);
+    const td    = parseFloat(document.getElementById('touchdowns').value);
+    const ints  = parseFloat(document.getElementById('interceptions').value);
+    const name  = document.getElementById('qbName').value.trim() || 'Your QB';
+
+    // Validation
+    if (isNaN(att) || att <= 0) { alert('Please enter a valid number of attempts (must be > 0).'); return; }
+    if (isNaN(comp) || isNaN(yards) || isNaN(td) || isNaN(ints)) { alert('Please fill in all stat fields.'); return; }
+    if (comp > att) { alert('Completions cannot exceed attempts.'); return; }
+    if (td > att || ints > att) { alert('TDs and INTs cannot exceed attempts.'); return; }
+
+    // Four components
+    const a = clamp(((comp / att) - 0.3) * 5,   0, 2.375);
+    const b = clamp(((yards / att) - 3) * 0.25, 0, 2.375);
+    const c = clamp((td / att) * 20,             0, 2.375);
+    const d = clamp(2.375 - ((ints / att) * 25), 0, 2.375);
+
+    const rating = ((a + b + c + d) / 6) * 100;
+    const rounded = Math.round(rating * 10) / 10;
+
+    // Update main display
+    const ratingEl = document.getElementById('ratingNumber');
+    ratingEl.textContent = rounded.toFixed(1);
+    ratingEl.classList.remove('hidden');
+
+    // Grade
+    let grade, gradeClass;
+    if (rounded >= 130)      { grade = '🐐 All-Time Great';   gradeClass = 'grade-elite'; }
+    else if (rounded >= 110) { grade = '⭐ Elite Performance'; gradeClass = 'grade-elite'; }
+    else if (rounded >= 100) { grade = '🔥 Excellent';         gradeClass = 'grade-great'; }
+    else if (rounded >= 90)  { grade = '✅ Above Average';     gradeClass = 'grade-good';  }
+    else if (rounded >= 80)  { grade = '➡️ Average';           gradeClass = 'grade-avg';   }
+    else if (rounded >= 65)  { grade = '⚠️ Below Average';    gradeClass = 'grade-poor';  }
+    else                     { grade = '❌ Struggling';        gradeClass = 'grade-bad';   }
+
+    const gradeEl = document.getElementById('ratingGrade');
+    gradeEl.textContent = grade;
+    gradeEl.className = 'rating-grade ' + gradeClass;
+
+    // Component bars (each out of 2.375 max)
+    const components = [
+      { bar: 'bar-a', val: 'val-a', value: a },
+      { bar: 'bar-b', val: 'val-b', value: b },
+      { bar: 'bar-c', val: 'val-c', value: c },
+      { bar: 'bar-d', val: 'val-d', value: d },
+    ];
+    components.forEach(comp => {
+      document.getElementById(comp.bar).style.width = ((comp.value / 2.375) * 100) + '%';
+      document.getElementById(comp.val).textContent = (Math.round(comp.value * 100) / 100).toFixed(2);
+    });
+
+    // Show hidden cards
+    document.getElementById('componentCard').classList.add('visible');
+    document.getElementById('yourRow').classList.add('visible');
+
+    // Your bar in HOF (max rating ~158.3, scale bar to that)
+    document.getElementById('yourName').textContent = name;
+    document.getElementById('yourRating').textContent = rounded.toFixed(1);
+    document.getElementById('yourBar').style.width = ((rounded / 158.3) * 100) + '%';
+  }
+
+  function resetAll() {
+    ['attempts','completions','yards','touchdowns','interceptions','qbName'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('ratingNumber').textContent = '—';
+    document.getElementById('ratingNumber').classList.add('hidden');
+    document.getElementById('ratingGrade').textContent = 'Enter stats and calculate';
+    document.getElementById('ratingGrade').className = 'rating-grade grade-empty';
+    ['bar-a','bar-b','bar-c','bar-d'].forEach(id => document.getElementById(id).style.width = '0%');
+    ['val-a','val-b','val-c','val-d'].forEach(id => document.getElementById(id).textContent = '—');
+    document.getElementById('componentCard').classList.remove('visible');
+    document.getElementById('yourRow').classList.remove('visible');
+    document.getElementById('yourBar').style.width = '0%';
+  }
+
+  // Allow Enter key to trigger calculation
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+</script>
+
+</body>
+</html>
